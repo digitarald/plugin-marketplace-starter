@@ -7,16 +7,14 @@ do not duplicate them here.
 ## Agent-specific rules
 
 - Keep the starter to two example plugins and at most two skills. Do not add a
-  UI framework, database, build step, or runtime dependency installer.
-- The host supplies `@github/copilot-sdk/extension`; never install or vendor it.
+  UI framework, database, or build step. Never vendor the runtime SDK.
 - Do not adopt legacy `.plugin/` or `.claude-plugin/` layouts from documentation.
 - Skill descriptions explain when to invoke them. Put detailed instructions
   in the body, and do not duplicate a skill as a command.
 - Formatter hooks must not return permission decisions. Return `{}` for no-ops,
-  and report changed files and diagnostics through the runtime's hook contract.
-  Never describe the hook as a security boundary or replacement for CI.
-- Add focused tests for behavior changes. Preserve coverage when replacing an
-  example rather than deleting tests just to make validation pass.
+  and never describe the hook as a security boundary or replacement for CI.
+- Preserve coverage when replacing an example; do not delete tests just to
+  make validation pass.
 - Keep secrets and token-bearing URLs out of files. Use host authentication
   for private repositories, not embedded credentials.
 - Do not commit, push, or publish unless the user requests it.
@@ -33,6 +31,3 @@ Consult the relevant contract before changing package or catalog fields:
 - [CLI plugin and catalog reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference).
 
 The README's [references](README.md#references) cover skills, hooks, and VS Code.
-Agent Plugins defines the portable package; Copilot defines marketplace
-distribution, hooks, and SDK extensions. Do not assume client-specific
-capabilities work in every Agent Plugins host.

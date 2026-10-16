@@ -23,8 +23,7 @@ Two example plugins, one skill, no runtime dependency installation.
 6. Test installation from your new GitHub repository before sharing it.
 
 For agent-assisted setup and maintenance, see [AGENTS.md](AGENTS.md). It links
-the plugin and marketplace specifications and lists what to update when
-turning this template into your team's marketplace.
+the plugin and marketplace specifications and adds agent-specific rules.
 
 Only marketplace contributors need `npm ci`. Installed examples use Node.js
 22.12 or newer and the SDK supplied by Copilot. Review plugins before trusting
