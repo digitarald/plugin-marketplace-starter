@@ -1,12 +1,13 @@
 # Plugin marketplace starter
 
 A small GitHub template for teams distributing Agent Plugins 1.0 packages.
-Two example plugins, one skill, no runtime dependency installation.
+Three example plugins, two skills, no runtime dependency installation.
 
 | Plugin | Try it | Teaches |
 |---|---|---|
-| [team-brainstorm](plugins/team-brainstorm/) | "Let's brainstorm a release plan together" | Skills, canvas actions, a shared session-only UI |
+| [bug-report](plugins/bug-report/) | "Turn these notes into a bug report" | A basic skill that loads the right template on demand |
 | [format-json](plugins/format-json/) | Ask Copilot to edit a JSON file | CLI-compatible post-tool hooks, affected-file formatting |
+| [team-brainstorm](plugins/team-brainstorm/) | "Let's brainstorm a release plan together" | Skills, canvas actions, a shared session-only UI |
 
 ## Make it yours
 
@@ -39,6 +40,7 @@ every VS Code chat provider or CLI version supports that UI.
 
 ```sh
 copilot plugin marketplace add digitarald/plugin-marketplace-starter
+copilot plugin install bug-report@plugin-marketplace-starter
 copilot plugin install team-brainstorm@plugin-marketplace-starter
 copilot plugin install format-json@plugin-marketplace-starter
 ```
@@ -58,7 +60,7 @@ continues in chat. The CLI-compatible hook has no separate VS Code variant.
 
 ## Develop without publishing
 
-Opening this checkout in a trusted shared-runtime Copilot session makes both
+Opening this checkout in a trusted shared-runtime Copilot session makes all three
 plugins available from the working files. The repository-scoped
 [settings overlay](.github/copilot/settings.json) declares this directory as a
 marketplace and enables each example. No global plugin installation is needed.
@@ -79,7 +81,7 @@ copilot plugin list --json
 copilot plugin marketplace list --json
 ```
 
-In a runtime with live repository marketplaces, the list shows both examples
+In a runtime with live repository marketplaces, the list shows all three examples
 as enabled with `source: "live"`. Changes are read from this checkout on session
 startup rather than a globally installed copy.
 
@@ -93,10 +95,11 @@ executes or that the host can present the canvas. Use the host checks below to
 verify those behaviors.
 
 For hosts without repository-overlay support, or to test in a different project,
-pass both plugins explicitly with absolute paths:
+pass plugins explicitly with absolute paths:
 
 ```sh
-copilot --plugin-dir /absolute/path/to/plugins/team-brainstorm \
+copilot --plugin-dir /absolute/path/to/plugins/bug-report \
+  --plugin-dir /absolute/path/to/plugins/team-brainstorm \
   --plugin-dir /absolute/path/to/plugins/format-json
 ```
 
@@ -107,6 +110,12 @@ No plugin code depends on this repository's development dependencies.
 ```text
 marketplace.json
 plugins/
+  bug-report/
+    plugin.json
+    skills/bug-report/SKILL.md
+    skills/bug-report/templates/
+      ui.md
+      cli.md
   team-brainstorm/
     plugin.json
     skills/team-brainstorm/SKILL.md
@@ -133,7 +142,7 @@ root; it is deliberately not included in this starter.
 
 ## Add a plugin
 
-1. Copy the smaller example into `plugins/<name>/`.
+1. Copy the closest example into `plugins/<name>/`. `bug-report` is the smallest.
 2. Give it a unique name and update its manifest and any skill metadata.
 3. Add a relative source entry to the catalog and enable it in the repository settings.
 4. Keep the plugin self-contained. Never import a sibling plugin or root
@@ -155,10 +164,14 @@ formatter hook process with runtime-shaped edit events.
 CI runs these checks on Node.js 22 and 24 on all three desktop operating systems.
 CI does not invoke a model or require a GitHub token.
 
+The [bug-report smoke checks](plugins/bug-report/README.md#smoke-checks) cover
+skill activation, template selection, and clarification behavior. They use
+model-backed sessions and are separate from offline verification and CI.
+
 Before a release, smoke-test **both hosts**:
 
-- Open this trusted checkout and confirm both plugins are enabled without
-  global installation. Confirm the brainstorm skill is discovered.
+- Open this trusted checkout and confirm all three plugins are enabled without
+  global installation. Confirm both skills are discovered.
 - Install from GitHub in a separate test environment and confirm the same plugins.
 - Open the canvas; add, edit, move, and delete notes from the UI and agent.
 - Reopen the same panel and confirm notes remain. A new session starts empty.

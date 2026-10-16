@@ -3,6 +3,12 @@
   "owner": { "name": "digitarald" },
   "plugins": [
     {
+      "name": "bug-report",
+      "source": "./plugins/bug-report",
+      "version": "1.0.0",
+      "description": "Turn rough bug notes into a clear report without inventing missing details."
+    },
+    {
       "name": "team-brainstorm",
       "source": "./plugins/team-brainstorm",
       "version": "1.0.1",

@@ -8,6 +8,7 @@
     }
   },
   "enabledPlugins": {
+    "bug-report@plugin-marketplace-starter": true,
     "team-brainstorm@plugin-marketplace-starter": true,
     "format-json@plugin-marketplace-starter": true
   }

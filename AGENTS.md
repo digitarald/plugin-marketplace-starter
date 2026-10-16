@@ -6,7 +6,7 @@ do not duplicate them here.
 
 ## Agent-specific rules
 
-- Keep the starter to two example plugins and at most two skills. Do not add a
+- Keep the starter to three example plugins and at most two skills. Do not add a
   UI framework, database, or build step. Never vendor the runtime SDK.
 - Do not adopt legacy `.plugin/` or `.claude-plugin/` layouts from documentation.
 - Skill descriptions explain when to invoke them. Put detailed instructions
