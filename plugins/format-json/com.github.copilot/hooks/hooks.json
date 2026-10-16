@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "type": "command",
+        "command": "node \"${PLUGIN_ROOT}/com.github.copilot/hooks/format.mjs\"",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

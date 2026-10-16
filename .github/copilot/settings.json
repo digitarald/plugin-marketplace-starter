@@ -1,0 +1,14 @@
+{
+  "extraKnownMarketplaces": {
+    "plugin-marketplace-starter": {
+      "source": {
+        "source": "directory",
+        "path": "."
+      }
+    }
+  },
+  "enabledPlugins": {
+    "team-brainstorm@plugin-marketplace-starter": true,
+    "format-json@plugin-marketplace-starter": true
+  }
+}

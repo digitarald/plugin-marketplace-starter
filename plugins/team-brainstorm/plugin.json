@@ -1,0 +1,8 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "team-brainstorm",
+  "version": "1.0.1",
+  "description": "Brainstorm together on a small, session-only canvas.",
+  "license": "MIT",
+  "keywords": ["brainstorm", "canvas", "team"]
+}

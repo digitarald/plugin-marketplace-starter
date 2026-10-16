@@ -1,0 +1,8 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "format-json",
+  "version": "1.0.0",
+  "description": "Format affected JSON files after successful agent edits.",
+  "license": "MIT",
+  "keywords": ["formatting", "json", "hooks"]
+}

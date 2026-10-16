@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team brainstorm</title>
+<style>
+  :root { color-scheme: light; font: 16px/1.5 system-ui, sans-serif; color: #302d25; background: #f8f5ec; accent-color: #605029; }
+  * { box-sizing: border-box; }
+  body { margin: 0 auto; max-width: 1100px; padding: clamp(20px, 4vw, 48px); }
+  h1 { font-size: clamp(24px, 4vw, 36px); letter-spacing: -.025em; margin: 0; }
+  header p { margin: 4px 0 28px; color: #615c4e; }
+  form { display: grid; grid-template-columns: 1fr auto auto; align-items: end; gap: 12px; }
+  label { display: grid; gap: 5px; font-weight: 600; }
+  textarea, select, button { font: inherit; color: inherit; border: 1px solid #a49a80; border-radius: 6px; padding: 9px 12px; background: #fffdf7; }
+  textarea { width: 100%; min-height: 72px; resize: vertical; caret-color: #605029; }
+  textarea::placeholder { color: #6b6453; }
+  button { cursor: pointer; }
+  button:hover { background: #eee7d6; }
+  button:disabled { cursor: wait; opacity: .6; }
+  :focus-visible { outline: 3px solid #755516; outline-offset: 3px; }
+  ::selection { background: #dfcb88; color: #302d25; }
+  #submit { background: #423c2c; color: #fffdf7; border-color: #423c2c; }
+  #submit:hover { background: #605029; }
+  #cancel[hidden] { display: none; }
+  #status { min-height: 24px; margin: 12px 0; color: #615c4e; }
+  #status.error { color: #962d21; }
+  main { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  section h2 { font-size: 18px; border-bottom: 1px solid #c9bfa5; padding-bottom: 10px; margin: 12px 0 16px; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { padding: 16px; margin-bottom: 14px; background: #f3e5a9; box-shadow: 0 3px 9px #302d2512; border-radius: 3px; overflow-wrap: anywhere; }
+  section:nth-child(2) li { background: #e8e4f0; }
+  section:nth-child(3) li { background: #dcead8; }
+  li p { margin: 0 0 14px; white-space: pre-wrap; }
+  li button { font-size: 13px; padding: 4px 9px; background: transparent; margin-right: 8px; border-color: #80765d; }
+  li.empty { color: #615c4e; font-size: 14px; background: transparent; box-shadow: none; padding: 0; }
+  @media (max-width: 600px) { main { grid-template-columns: 1fr; gap: 10px; } form { grid-template-columns: 1fr auto; } form label:first-child { grid-column: 1 / -1; } }
+</style>
+<header><h1>Room to think.</h1><p>A shared board for you and Copilot. Notes disappear when the session ends.</p></header>
+<form id="form">
+  <label>A short thought<textarea id="text" maxlength="500" required placeholder="What should we explore?"></textarea></label>
+  <label>Column<select id="column"><option value="ideas">Ideas</option><option value="questions">Questions</option><option value="next">Next</option></select></label>
+  <button id="submit">Add note</button>
+  <button id="cancel" type="button" hidden>Cancel edit</button>
+</form>
+<p id="status" role="status" aria-live="polite">Connecting to your board...</p>
+<main aria-label="Brainstorm board">
+  <section><h2>Ideas</h2><ul id="ideas"></ul></section>
+  <section><h2>Questions</h2><ul id="questions"></ul></section>
+  <section><h2>Next</h2><ul id="next"></ul></section>
+</main>
+<script type="module">
+  const form = document.querySelector("#form");
+  const text = document.querySelector("#text");
+  const column = document.querySelector("#column");
+  const submit = document.querySelector("#submit");
+  const cancel = document.querySelector("#cancel");
+  const status = document.querySelector("#status");
+  let editing;
+  function message(value, error = false) {
+    status.textContent = value;
+    status.classList.toggle("error", error);
+  }
+  function reset() {
+    editing = undefined; form.reset(); submit.textContent = "Add note"; cancel.hidden = true;
+  }
+  async function mutate(path, input) {
+    const response = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error);
+  }
+  function render(board) {
+    const focused = document.activeElement;
+    const focusedNote = focused?.closest("li")?.dataset.noteId;
+    let restoreFocus;
+    for (const name of ["ideas", "questions", "next"]) {
+      const list = document.getElementById(name);
+      list.replaceChildren();
+      const notes = board.notes.filter((note) => note.column === name);
+      if (!notes.length) {
+        const empty = document.createElement("li");
+        empty.className = "empty"; empty.textContent = "Nothing here yet.";
+        list.append(empty);
+      }
+      for (const note of notes) {
+        const item = document.createElement("li");
+        item.dataset.noteId = note.id;
+        const content = document.createElement("p");
+        content.textContent = note.text;
+        const edit = document.createElement("button");
+        edit.dataset.action = "edit";
+        edit.textContent = "Edit";
+        edit.setAttribute("aria-label", `Edit: ${note.text}`);
+        edit.onclick = () => {
+          editing = note.id; text.value = note.text; column.value = note.column;
+          submit.textContent = "Save note"; cancel.hidden = false; text.focus();
+        };
+        const remove = document.createElement("button");
+        remove.dataset.action = "delete";
+        remove.textContent = "Delete";
+        remove.setAttribute("aria-label", `Delete: ${note.text}`);
+        remove.onclick = async () => {
+          remove.disabled = true;
+          try {
+            await mutate("/remove", { id: note.id });
+            if (editing === note.id) reset();
+            message("Note deleted."); text.focus();
+          } catch (error) { message(error.message, true); remove.disabled = false; }
+        };
+        item.append(content, edit, remove); list.append(item);
+        if (note.id === focusedNote) {
+          restoreFocus = focused.dataset.action === "edit" ? edit : remove;
+        }
+      }
+    }
+    if (focusedNote) (restoreFocus ?? text).focus();
+  }
+  cancel.onclick = () => { reset(); text.focus(); };
+  form.onsubmit = async (event) => {
+    event.preventDefault(); submit.disabled = true;
+    try {
+      await mutate("/notes", { ...(editing ? { id: editing } : {}), text: text.value, column: column.value });
+      reset(); message("Note saved."); text.focus();
+    } catch (error) { message(error.message, true); }
+    finally { submit.disabled = false; }
+  };
+  const events = new EventSource("/events");
+  events.onopen = () => message("Connected. Add a note, or ask Copilot to contribute.");
+  events.onmessage = (event) => render(JSON.parse(event.data));
+  events.onerror = () => message("Board disconnected. Reconnecting; if the session ended, reopen the canvas.", true);
+</script>
+</html>

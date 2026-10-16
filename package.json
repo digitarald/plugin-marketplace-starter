@@ -1,0 +1,16 @@
+{
+  "name": "plugin-marketplace-starter",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": { "node": ">=22.12" },
+  "scripts": {
+    "test": "node --test",
+    "check": "node scripts/validate.mjs",
+    "verify": "npm run check && npm test"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "yaml": "^2.8.1"
+  }
+}

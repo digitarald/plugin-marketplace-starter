@@ -1,0 +1,18 @@
+{
+  "name": "plugin-marketplace-starter",
+  "owner": { "name": "digitarald" },
+  "plugins": [
+    {
+      "name": "team-brainstorm",
+      "source": "./plugins/team-brainstorm",
+      "version": "1.0.1",
+      "description": "Brainstorm together on a small, session-only canvas."
+    },
+    {
+      "name": "format-json",
+      "source": "./plugins/format-json",
+      "version": "1.0.0",
+      "description": "Format affected JSON files after successful agent edits."
+    }
+  ]
+}
